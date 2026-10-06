@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Información del Vehículo</title>
+    <style>
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background-color: #f4f6f9; margin: 0; padding: 20px; display: flex; justify-content: center; align-items: center; min-height: 100vh; }
+        .card { background: #ffffff; border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); width: 100%; max-width: 480px; padding: 25px; box-sizing: border-box; }
+        .header { border-bottom: 2px solid #0056b3; padding-bottom: 12px; margin-bottom: 20px; text-align: center; }
+        .header h2 { margin: 0; color: #0056b3; font-size: 22px; }
+        .header p { margin: 5px 0 0 0; color: #666; font-weight: 600; }
+        .data-row { display: flex; justify-content: space-between; padding: 10px 0; border-bottom: 1px solid #eef2f5; }
+        .data-row:last-child { border-bottom: none; }
+        .label { font-weight: 600; color: #495057; }
+        .value { color: #212529; font-weight: 500; text-align: right; }
+        .badge { background-color: #28a745; color: white; padding: 3px 8px; border-radius: 4px; font-size: 12px; }
+        .error { color: #dc3545; text-align: center; font-weight: bold; }
+    </style>
+</head>
+<body>
+
+<div class="card" id="vehicleCard">
+    <div class="header">
+        <h2 id="modelo">Cargando...</h2>
+        <p id="placa"></p>
+    </div>
+    <div id="details"></div>
+</div>
+
+<script>
+    // Obtener el ID/Unidad desde la URL (ej. ?unid=233053)
+    const urlParams = new URLSearchParams(window.location.search);
+    const unidadQuery = urlParams.get('unid');
+
+    // Cargar la base de datos de vehículos
+    fetch('vehiculos.json')
+        .then(response => response.json())
+        .then(data => {
+            const vehiculo = data.find(v => String(v.No_Unidad) === String(unidadQuery));
+
+            if (vehiculo) {
+                document.getElementById('modelo').textContent = `${vehiculo.Modelo} (${vehiculo.Ano})`;
+                document.getElementById('placa').textContent = `Placa: ${vehiculo.Placa} | Unidad: #${vehiculo.No_Unidad}`;
+
+                const campos = [
+                    { label: "Sucursal", val: vehiculo.Sucursal },
+                    { label: "Ubicación Actual", val: vehiculo.Ubicacion_Actual || 'N/A' },
+                    { label: "Carrocería", val: vehiculo.Carroceria },
+                    { label: "Color", val: vehiculo.Color || 'N/A' },
+                    { label: "Kilómetros", val: Number(vehiculo.Kilometros).toLocaleString() + ' km' },
+                    { label: "Estado", val: vehiculo.Estado },
+                    { label: "Últ. Arrendamiento", val: vehiculo.Ult_Arrendamiento || 'N/A' },
+                    { label: "Días Inactivo", val: vehiculo.Dia_Inactivo },
+                    { label: "Fecha Registro / Hoy", val: vehiculo.Dia_Hoy }
+                ];
+
+                let htmlContent = '';
+                campos.forEach(c => {
+                    htmlContent += `
+                        <div class="data-row">
+                            <span class="label">${c.label}:</span>
+                            <span class="value">${c.val}</span>
+                        </div>`;
+                });
+                document.getElementById('details').innerHTML = htmlContent;
+            } else {
+                document.getElementById('vehicleCard').innerHTML = `<div class="error">Vehículo no encontrado o código QR no válido.</div>`;
+            }
+        })
+        .catch(err => {
+            document.getElementById('vehicleCard').innerHTML = `<div class="error">Error al cargar la información.</div>`;
+        });
+</script>
+</body>
+</html>
