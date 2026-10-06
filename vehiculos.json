@@ -1,0 +1,49 @@
+import pandas as pd
+import json
+
+# 1. Cargar el documento
+df = pd.read_excel('Full inventory; Actualizaciones.xlsx')
+
+# 2. Seleccionar y renombrar campos
+cols_map = {
+    'Sucursal  ': 'Sucursal',
+    'Ubicación Actual': 'Ubicacion_Actual',
+    'N.º Unid. ': 'No_Unidad',
+    'Año': 'Ano',
+    'Modelo': 'Modelo',
+    'Carrocería': 'Carroceria',
+    'Color': 'Color',
+    'Placa': 'Placa',
+    'Kilómetros': 'Kilometros',
+    'Estado': 'Estado',
+    'Últ. Arrend.': 'Ult_Arrendamiento',
+    'dia inactivo': 'Dia_Inactivo',
+    'Dia de hoy': 'Dia_Hoy'
+}
+
+df_clean = df[list(cols_map.keys())].rename(columns=cols_map)
+
+# Reemplazar valores nulos y formatear fechas
+df_clean['Ubicacion_Actual'] = df_clean['Ubicacion_Actual'].fillna('N/A')
+df_clean['Color'] = df_clean['Color'].fillna('N/A')
+df_clean['Ult_Arrendamiento'] = df_clean['Ult_Arrendamiento'].fillna('N/A')
+if pd.api.types.is_datetime64_any_dtype(df_clean['Dia_Hoy']):
+    df_clean['Dia_Hoy'] = df_clean['Dia_Hoy'].dt.strftime('%Y-%m-%d')
+
+# 3. Exportar a JSON para la página web
+json_data = df_clean.to_dict(orient='records')
+with open('vehiculos.json', 'w', encoding='utf-8') as f:
+    json.dump(json_data, f, ensure_ascii=False, indent=2)
+
+# 4. Dominio web donde alojarás la solución (reemplazar con la URL final de tu empresa)
+BASE_URL = "https://tuempresa.github.io/flota/?unid="
+
+# 5. Generar la columna con el enlace individual y enlace directo de imagen QR
+df_clean['URL_Ficha_Individual'] = df_clean['No_Unidad'].apply(lambda u: f"{BASE_URL}{u}")
+df_clean['Imagen_QR_API'] = df_clean['URL_Ficha_Individual'].apply(
+    lambda url: f"https://api.qrserver.com/v1/create-qr-code/?size=200x200&data={url}"
+)
+
+# Guardar nuevo Excel con URLs de QR
+df_clean.to_excel('Flota_Con_URLs_y_QRs.xlsx', index=False)
+print("¡Proceso completado! Se generaron 'vehiculos.json' y 'Flota_Con_URLs_y_QRs.xlsx'.")
