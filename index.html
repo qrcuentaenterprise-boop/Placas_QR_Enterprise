@@ -14,8 +14,7 @@
         .data-row:last-child { border-bottom: none; }
         .label { font-weight: 600; color: #495057; }
         .value { color: #212529; font-weight: 500; text-align: right; }
-        .badge { background-color: #28a745; color: white; padding: 3px 8px; border-radius: 4px; font-size: 12px; }
-        .error { color: #dc3545; text-align: center; font-weight: bold; }
+        .error { color: #dc3545; text-align: center; font-weight: bold; padding: 15px; }
     </style>
 </head>
 <body>
@@ -29,47 +28,67 @@
 </div>
 
 <script>
-    // Obtener el ID/Unidad desde la URL (ej. ?unid=233053)
     const urlParams = new URLSearchParams(window.location.search);
     const unidadQuery = urlParams.get('unid');
 
-    // Cargar la base de datos de vehículos
-    fetch('vehiculos.json')
-        .then(response => response.json())
+    // Forzar actualización evitando caché con marca de tiempo
+    fetch('./vehiculos.json?v=' + new Date().getTime())
+        .then(response => {
+            if (!response.ok) {
+                throw new Error('No se encontró el archivo vehiculos.json (HTTP ' + response.status + ')');
+            }
+            return response.json();
+        })
         .then(data => {
-            const vehiculo = data.find(v => String(v.No_Unidad) === String(unidadQuery));
+            if (!unidadQuery) {
+                document.getElementById('vehicleCard').innerHTML = `<div class="error">No se especificó ninguna unidad en la URL (ejemplo: ?unid=233053).</div>`;
+                return;
+            }
+
+            // Buscar coincidencia en el campo No_Unidad o 'N.º Unid. '
+            const vehiculo = data.find(v => {
+                const unidVal = v.No_Unidad || v['N.º Unid. '] || v['No_Unidad'];
+                return String(unidVal).trim() === String(unidadQuery).trim();
+            });
 
             if (vehiculo) {
-                document.getElementById('modelo').textContent = `${vehiculo.Modelo} (${vehiculo.Ano})`;
-                document.getElementById('placa').textContent = `Placa: ${vehiculo.Placa} | Unidad: #${vehiculo.No_Unidad}`;
+                const modelo = vehiculo.Modelo || vehiculo['Modelo'] || 'Vehículo';
+                const ano = vehiculo.Ano || vehiculo['Año'] || '';
+                const placa = vehiculo.Placa || vehiculo['Placa'] || 'Sin Placa';
+                const unid = vehiculo.No_Unidad || vehiculo['N.º Unid. '] || unidadQuery;
+
+                document.getElementById('modelo').textContent = `${modelo} ${ano ? '(' + ano + ')' : ''}`;
+                document.getElementById('placa').textContent = `Placa: ${placa} | Unidad: #${unid}`;
 
                 const campos = [
-                    { label: "Sucursal", val: vehiculo.Sucursal },
-                    { label: "Ubicación Actual", val: vehiculo.Ubicacion_Actual || 'N/A' },
-                    { label: "Carrocería", val: vehiculo.Carroceria },
-                    { label: "Color", val: vehiculo.Color || 'N/A' },
-                    { label: "Kilómetros", val: Number(vehiculo.Kilometros).toLocaleString() + ' km' },
-                    { label: "Estado", val: vehiculo.Estado },
-                    { label: "Últ. Arrendamiento", val: vehiculo.Ult_Arrendamiento || 'N/A' },
-                    { label: "Días Inactivo", val: vehiculo.Dia_Inactivo },
-                    { label: "Fecha Registro / Hoy", val: vehiculo.Dia_Hoy }
+                    { label: "Sucursal", val: vehiculo.Sucursal || vehiculo['Sucursal  '] },
+                    { label: "Ubicación Actual", val: vehiculo.Ubicacion_Actual || vehiculo['Ubicación Actual'] },
+                    { label: "Carrocería", val: vehiculo.Carroceria || vehiculo['Carrocería'] },
+                    { label: "Color", val: vehiculo.Color || vehiculo['Color'] },
+                    { label: "Kilómetros", val: vehiculo.Kilometros || vehiculo['Kilómetros'] },
+                    { label: "Estado", val: vehiculo.Estado || vehiculo['Estado'] },
+                    { label: "Últ. Arrendamiento", val: vehiculo.Ult_Arrendamiento || vehiculo['Últ. Arrend.'] },
+                    { label: "Días Inactivo", val: vehiculo.Dia_Inactivo || vehiculo['dia inactivo'] },
+                    { label: "Fecha Registro / Hoy", val: vehiculo.Dia_Hoy || vehiculo['Dia de hoy'] }
                 ];
 
                 let htmlContent = '';
                 campos.forEach(c => {
+                    const valorMostrar = (c.val !== undefined && c.val !== null && c.val !== '' && String(c.val) !== 'nan' && String(c.val) !== 'N/A') ? c.val : 'Sin datos';
                     htmlContent += `
                         <div class="data-row">
                             <span class="label">${c.label}:</span>
-                            <span class="value">${c.val}</span>
+                            <span class="value">${valorMostrar}</span>
                         </div>`;
                 });
                 document.getElementById('details').innerHTML = htmlContent;
             } else {
-                document.getElementById('vehicleCard').innerHTML = `<div class="error">Vehículo no encontrado o código QR no válido.</div>`;
+                document.getElementById('vehicleCard').innerHTML = `<div class="error">No se encontró la unidad #${unidadQuery} en la base de datos.</div>`;
             }
         })
         .catch(err => {
-            document.getElementById('vehicleCard').innerHTML = `<div class="error">Error al cargar la información.</div>`;
+            console.error("Error al procesar el archivo:", err);
+            document.getElementById('vehicleCard').innerHTML = `<div class="error">Error al cargar la información.<br><br><small style="font-weight:normal; color:#666;">Detalle técnico: ${err.message}</small></div>`;
         });
 </script>
 </body>
