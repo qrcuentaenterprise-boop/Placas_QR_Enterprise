@@ -3,8 +3,9 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Enterprise Rent-A-Car - Ficha Técnica de Vehículo</title>
+    <title>Enterprise Rent-A-Car - Ficha Horizontal</title>
     <style>
+      /* Importación de tipografía serif de respaldo */
       @import url("https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600&display=swap");
 
       * {
@@ -13,14 +14,17 @@
         padding: 0;
       }
 
-      html, body {
+      html,
+      body {
         width: 100%;
         background-color: #ffffff;
         color: #111111;
         scroll-behavior: smooth;
       }
 
-      /* AVISO PARA FORZAR PANTALLA HORIZONTAL EN MÓVILES */
+      /* -------------------------------------------------------------
+           AVISO PARA FORZAR PANTALLA HORIZONTAL EN MÓVILES
+        ------------------------------------------------------------- */
       .portrait-warning {
         display: none;
         position: fixed;
@@ -57,7 +61,9 @@
         }
       }
 
-      /* SECCIÓN 1: HERO SHOWCASE (HORIZONTAL) */
+      /* -------------------------------------------------------------
+           SECCIÓN 1: PANTALLA COMPLETA HORIZONTAL (HERO SHOWCASE)
+        ------------------------------------------------------------- */
       .hero-screen {
         width: 100vw;
         height: 100vh;
@@ -70,6 +76,7 @@
         padding: 15px 40px;
       }
 
+      /* Header Superior */
       .top-header {
         width: 100%;
         display: flex;
@@ -87,23 +94,26 @@
         font-weight: normal;
       }
 
+      /* Logo Enterprise (Modificado por el usuario) */
       .enterprise-logo {
         height: 50px;
-        max-height: 22vh;
-        width: auto;
+        max-height: 22vh; /* Evita que desplace la escena central en pantallas cortas */
+        width: auto; /* Protege la proporción original sin estirar */
         object-fit: contain;
         border-radius: 4px;
       }
 
+      /* Escenario Central */
       .stage-container {
         position: relative;
         flex: 1;
-        min-height: 0;
+        min-height: 0; /* Previene desbordamiento en contenedores flex */
         display: flex;
         align-items: center;
         justify-content: center;
       }
 
+      /* Título Principal de la Marca (Felix Titling) */
       .car-brand-title {
         position: absolute;
         top: 0px;
@@ -117,21 +127,23 @@
         text-align: center;
       }
 
-      .brand-bg-logo {
+      /* Logo Marca Pequeño (Se desplaza a la izquierda) */
+      .toyota-bg-logo {
         position: absolute;
-        height: 50px;
+        height: 40px;
         max-height: 15vh;
         z-index: 2;
         top: 50%;
         left: 50%;
         transform: translate(-50%, -50%);
-        animation: moveBrandLeft 3.5s cubic-bezier(0.25, 1, 0.5, 1) forwards;
+        animation: moveToyotaLeft 3.5s cubic-bezier(0.25, 1, 0.5, 1) forwards;
       }
 
+      /* Imagen del Carro (Modificado por el usuario) */
       .car-transparent-img {
         position: absolute;
         height: 250px;
-        max-height: 150vh;
+        max-height: 150vh; /* Se escala proporcionalmente al tamaño del logo */
         max-width: 800px;
         object-fit: contain;
         z-index: 4;
@@ -140,6 +152,7 @@
         animation: slowCarFadeIn 3.5s cubic-bezier(0.25, 1, 0.5, 1) forwards;
       }
 
+      /* Placa Guatemala */
       .license-plate-badge {
         position: absolute;
         bottom: 5px;
@@ -169,6 +182,7 @@
         color: #111111;
       }
 
+      /* Ubicación Actual (Modificado por el usuario: bottom: 40px) */
       .hero-location-box {
         position: absolute;
         bottom: 40px;
@@ -198,6 +212,7 @@
         letter-spacing: 0.5px;
       }
 
+      /* Indicador para deslizar hacia abajo */
       .scroll-indicator {
         text-align: center;
         z-index: 10;
@@ -208,7 +223,9 @@
         animation: bounce 2s infinite;
       }
 
-      /* SECCIÓN 2: ESPECIFICACIONES TÉCNICAS */
+      /* -------------------------------------------------------------
+           SECCIÓN 2: DETALLES Y ESPECIFICACIONES (AL BAJAR)
+        ------------------------------------------------------------- */
       .details-screen {
         min-height: 100vh;
         background-color: #ffffff;
@@ -231,6 +248,7 @@
         gap: 25px;
       }
 
+      /* Elemento suspendido sobre línea negra inferior */
       .spec-item {
         background: transparent;
         padding: 8px 0px;
@@ -240,8 +258,10 @@
         box-shadow: none;
       }
 
+      /* Etiqueta del dato (Oblicuo) */
       .label-text {
-        font-family: "Franklin Gothic Book", "Franklin Gothic Medium", "Arial", sans-serif;
+        font-family:
+          "Franklin Gothic Book", "Franklin Gothic Medium", "Arial", sans-serif;
         font-style: italic;
         font-weight: normal;
         font-size: 0.85rem;
@@ -250,8 +270,10 @@
         margin-bottom: 4px;
       }
 
+      /* Valor del dato (Normal, sin negrita) */
       .value-text {
-        font-family: "Franklin Gothic Book", "Franklin Gothic Medium", "Arial", sans-serif;
+        font-family:
+          "Franklin Gothic Book", "Franklin Gothic Medium", "Arial", sans-serif;
         font-style: normal;
         font-weight: normal;
         font-size: 1.05rem;
@@ -259,75 +281,144 @@
         display: block;
       }
 
-      .error-msg {
-        color: #dc3545;
-        font-family: sans-serif;
-        padding: 20px;
-        text-align: center;
-      }
+      /* -------------------------------------------------------------
+           KEYFRAMES - ANIMACIONES CSS
+        ------------------------------------------------------------- */
 
-      /* ANIMACIONES */
+      /* 1. Entrada desvanecida desde la derecha */
       @keyframes slowCarFadeIn {
-        0% { left: 120%; opacity: 0; }
-        100% { left: 50%; transform: translate(-50%, -50%); opacity: 1; }
+        0% {
+          left: 120%;
+          opacity: 0;
+        }
+        100% {
+          left: 50%;
+          transform: translate(-50%, -50%);
+          opacity: 1;
+        }
       }
 
-      @keyframes moveBrandLeft {
-        0% { left: 50%; transform: translate(-50%, -50%); opacity: 0.15; filter: grayscale(80%); }
-        100% { left: 20%; transform: translate(-50%, -50%); opacity: 1; filter: grayscale(0%); }
+      /* 2. Logo Toyota hacia la izquierda */
+      @keyframes moveToyotaLeft {
+        0% {
+          left: 50%;
+          transform: translate(-50%, -50%);
+          opacity: 0.15;
+          filter: grayscale(80%);
+        }
+        100% {
+          left: 20%;
+          transform: translate(-50%, -50%);
+          opacity: 1;
+          filter: grayscale(0%);
+        }
       }
 
       @keyframes popPlate {
-        0% { transform: scale(0); opacity: 0; }
-        100% { transform: scale(1); opacity: 1; }
+        0% {
+          transform: scale(0);
+          opacity: 0;
+        }
+        100% {
+          transform: scale(1);
+          opacity: 1;
+        }
       }
 
       @keyframes bounce {
-        0%, 20%, 50%, 80%, 100% { transform: translateY(0); }
-        40% { transform: translateY(-6px); }
-        60% { transform: translateY(-3px); }
+        0%, 20%, 50%, 80%, 100% {
+          transform: translateY(0);
+        }
+        40% {
+          transform: translateY(-6px);
+        }
+        60% {
+          transform: translateY(-3px);
+        }
       }
 
       @keyframes rotateIcon {
-        0% { transform: rotate(0deg); }
-        50% { transform: rotate(90deg); }
-        100% { transform: rotate(0deg); }
+        0% {
+          transform: rotate(0deg);
+        }
+        50% {
+          transform: rotate(90deg);
+        }
+        100% {
+          transform: rotate(0deg);
+        }
       }
     </style>
   </head>
   <body>
-    <!-- Aviso pantalla horizontal -->
+    <!-- Aviso para rotar pantalla -->
     <div class="portrait-warning">
-      <svg viewBox="0 0 24 24" fill="none" stroke="#00843D" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+      <svg
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="#00843D"
+        stroke-width="2"
+        stroke-linecap="round"
+        stroke-linejoin="round"
+      >
         <rect x="5" y="2" width="14" height="20" rx="2" ry="2"></rect>
         <line x1="12" y1="18" x2="12.01" y2="18"></line>
       </svg>
-      <p>Por favor, gira tu dispositivo horizontalmente<br />para ver el vehículo a pantalla completa.</p>
+      <p>
+        Por favor, gira tu dispositivo horizontalmente
+        <br />
+        para ver el vehículo a pantalla completa.
+      </p>
     </div>
 
     <!-- PANTALLA 1: HERO SHOWCASE -->
-    <section class="hero-screen" id="heroScreen">
+    <section class="hero-screen">
+      <!-- Header Superior -->
       <div class="top-header">
         <div class="header-title-small">Enterprise Rent-A-Car Guatemala</div>
-        <img class="enterprise-logo" src="https://media.licdn.com/dms/image/v2/C4D0BAQFjELQV6Mht4Q/company-logo_200_200/company-logo_200_200/0/1630461311753/enterprise_rent_a_car_national_car_rental_logo?e=2147483647&v=beta&t=tsnz9TENE3HzTYl_DXh8fKTlxwC25tFxa6G-yVBP_Mg" alt="Enterprise Rent-A-Car Logo" />
+        <!-- Logo Enterprise exacto que ingresaste -->
+        <img
+          class="enterprise-logo"
+          src="https://www.enterprise.com/content/dam/ecom/logo-enterprise.png"
+          alt="Enterprise Rent-A-Car Logo"
+        />
       </div>
 
+      <!-- Escenario Central -->
       <div class="stage-container">
-        <div class="car-brand-title" id="carTitle">Cargando...</div>
-        <img class="brand-bg-logo" id="brandLogo" src="https://upload.wikimedia.org/wikipedia/commons/e/e7/Toyota.svg" alt="Brand Logo" />
-        <img class="car-transparent-img" id="carImg" src="https://pngimg.com/uploads/toyota/toyota_PNG1912.png" alt="Car Image" />
+        <!-- Título de la Marca (Felix Titling) -->
+        <div class="car-brand-title" id="carTitle">TOYOTA HILUX 4X4</div>
 
+        <!-- Logo Marca Pequeño (Se desplaza a la izquierda) -->
+        <img
+          class="toyota-bg-logo"
+          id="brandLogo"
+          src="https://upload.wikimedia.org/wikipedia/commons/e/e7/Toyota.svg"
+          alt="Toyota Logo"
+        />
+
+        <!-- Carro Transparente -->
+        <img
+          class="car-transparent-img"
+          id="carImg"
+          src="https://pngimg.com/uploads/toyota/toyota_PNG1912.png"
+          alt="Toyota Hilux"
+        />
+
+        <!-- Placa Guatemala -->
         <div class="license-plate-badge">
           <span class="plate-country">GUATEMALA</span>
-          <span class="plate-number" id="plateNumber">---</span>
+          <span class="plate-number" id="plateNumber">P-576KHZ</span>
         </div>
       </div>
 
+      <!-- Ubicación Actual -->
       <div class="hero-location-box">
         <span class="hero-location-label">Ubicación Actual</span>
-        <span class="hero-location-value" id="locationValue">---</span>
+        <span class="hero-location-value" id="locationValue">AVENIDA HINCAPIÉ</span>
       </div>
 
+      <!-- Flecha para deslizar -->
       <div class="scroll-indicator">
         ▼ Desliza hacia abajo para ver especificaciones
       </div>
@@ -336,17 +427,17 @@
     <!-- PANTALLA 2: DATOS TÉCNICOS -->
     <section class="details-screen">
       <h2 class="section-header">Especificaciones Técnicas</h2>
+
       <div class="specs-grid" id="specsGrid">
         <!-- Generado dinámicamente -->
       </div>
     </section>
 
-    <!-- SCRIPT DE LECTURA DINÁMICA -->
+    <!-- SCRIPT DE CARGA DINÁMICA DE VEHÍCULOS -->
     <script>
       const urlParams = new URLSearchParams(window.location.search);
       const unidadQuery = urlParams.get('unid');
 
-      // Diccionario de logos por marca
       const LOGOS_MARCA = {
         TOYOTA: "https://upload.wikimedia.org/wikipedia/commons/e/e7/Toyota.svg",
         CHEVROLET: "https://upload.wikimedia.org/wikipedia/commons/1/1e/Chevrolet_logo.svg",
@@ -363,10 +454,7 @@
           return response.json();
         })
         .then(data => {
-          if (!unidadQuery) {
-            document.getElementById('carTitle').textContent = "UNIDAD NO ESPECIFICADA";
-            return;
-          }
+          if (!unidadQuery) return;
 
           const vehiculo = data.find(v => {
             const unidVal = v.No_Unidad || v['N.º Unid. '] || v['No_Unidad'];
@@ -379,12 +467,10 @@
             const placa = vehiculo.Placa || vehiculo['Placa'] || 'SIN PLACA';
             const ubicacion = vehiculo.Ubicacion_Actual || vehiculo['Ubicación Actual'] || vehiculo.Sucursal || 'N/A';
 
-            // Actualizar vista Hero
             document.getElementById('carTitle').textContent = `${modelo} ${ano}`;
             document.getElementById('plateNumber').textContent = placa;
             document.getElementById('locationValue').textContent = String(ubicacion) !== 'nan' ? ubicacion : 'N/A';
 
-            // Asignar logo de la marca según modelo
             let marcaEncontrada = "TOYOTA";
             const modUpper = modelo.toUpperCase();
             if (modUpper.includes("N400") || modUpper.includes("AVEO") || modUpper.includes("CHEVROLET")) marcaEncontrada = "CHEVROLET";
@@ -396,7 +482,6 @@
 
             document.getElementById('brandLogo').src = LOGOS_MARCA[marcaEncontrada] || LOGOS_MARCA.TOYOTA;
 
-            // Construir Especificaciones Técnicas
             const campos = [
               { label: "Año", val: ano },
               { label: "Modelo", val: modelo },
@@ -421,14 +506,12 @@
                 </div>`;
             });
             document.getElementById('specsGrid').innerHTML = specsHTML;
-
           } else {
             document.getElementById('carTitle').textContent = `UNIDAD #${unidadQuery} NO ENCONTRADA`;
           }
         })
         .catch(err => {
           console.error(err);
-          document.getElementById('carTitle').textContent = "ERROR AL CARGAR DATOS";
         });
     </script>
   </body>
