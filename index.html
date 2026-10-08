@@ -1,95 +1,435 @@
 <!DOCTYPE html>
 <html lang="es">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Información del Vehículo</title>
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Enterprise Rent-A-Car - Ficha Técnica de Vehículo</title>
     <style>
-        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background-color: #f4f6f9; margin: 0; padding: 20px; display: flex; justify-content: center; align-items: center; min-height: 100vh; }
-        .card { background: #ffffff; border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); width: 100%; max-width: 480px; padding: 25px; box-sizing: border-box; }
-        .header { border-bottom: 2px solid #0056b3; padding-bottom: 12px; margin-bottom: 20px; text-align: center; }
-        .header h2 { margin: 0; color: #0056b3; font-size: 22px; }
-        .header p { margin: 5px 0 0 0; color: #666; font-weight: 600; }
-        .data-row { display: flex; justify-content: space-between; padding: 10px 0; border-bottom: 1px solid #eef2f5; }
-        .data-row:last-child { border-bottom: none; }
-        .label { font-weight: 600; color: #495057; }
-        .value { color: #212529; font-weight: 500; text-align: right; }
-        .error { color: #dc3545; text-align: center; font-weight: bold; padding: 15px; }
+      @import url("https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600&display=swap");
+
+      * {
+        box-sizing: border-box;
+        margin: 0;
+        padding: 0;
+      }
+
+      html, body {
+        width: 100%;
+        background-color: #ffffff;
+        color: #111111;
+        scroll-behavior: smooth;
+      }
+
+      /* AVISO PARA FORZAR PANTALLA HORIZONTAL EN MÓVILES */
+      .portrait-warning {
+        display: none;
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100vw;
+        height: 100vh;
+        background: #ffffff;
+        z-index: 9999;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        text-align: center;
+        padding: 20px;
+      }
+
+      .portrait-warning svg {
+        width: 50px;
+        height: 50px;
+        margin-bottom: 15px;
+        animation: rotateIcon 2s infinite ease-in-out;
+      }
+
+      .portrait-warning p {
+        font-family: "Franklin Gothic Book", "Arial", sans-serif;
+        font-size: 1.1rem;
+        color: #00843d;
+        font-weight: normal;
+      }
+
+      @media (orientation: portrait) and (max-width: 900px) {
+        .portrait-warning {
+          display: flex;
+        }
+      }
+
+      /* SECCIÓN 1: HERO SHOWCASE (HORIZONTAL) */
+      .hero-screen {
+        width: 100vw;
+        height: 100vh;
+        position: relative;
+        background-color: #ffffff;
+        overflow: hidden;
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
+        padding: 15px 40px;
+      }
+
+      .top-header {
+        width: 100%;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        z-index: 10;
+      }
+
+      .header-title-small {
+        font-family: "Felix Titling", "Cinzel", "Georgia", serif;
+        font-size: 0.85rem;
+        letter-spacing: 2px;
+        color: #555555;
+        text-transform: uppercase;
+        font-weight: normal;
+      }
+
+      .enterprise-logo {
+        height: 50px;
+        max-height: 22vh;
+        width: auto;
+        object-fit: contain;
+        border-radius: 4px;
+      }
+
+      .stage-container {
+        position: relative;
+        flex: 1;
+        min-height: 0;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+      }
+
+      .car-brand-title {
+        position: absolute;
+        top: 0px;
+        font-family: "Felix Titling", "Cinzel", "Georgia", serif;
+        font-size: 2.1rem;
+        letter-spacing: 4px;
+        color: #111111;
+        text-transform: uppercase;
+        z-index: 5;
+        font-weight: normal;
+        text-align: center;
+      }
+
+      .brand-bg-logo {
+        position: absolute;
+        height: 50px;
+        max-height: 15vh;
+        z-index: 2;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        animation: moveBrandLeft 3.5s cubic-bezier(0.25, 1, 0.5, 1) forwards;
+      }
+
+      .car-transparent-img {
+        position: absolute;
+        height: 250px;
+        max-height: 150vh;
+        max-width: 800px;
+        object-fit: contain;
+        z-index: 4;
+        top: 50%;
+        transform: translateY(-50%);
+        animation: slowCarFadeIn 3.5s cubic-bezier(0.25, 1, 0.5, 1) forwards;
+      }
+
+      .license-plate-badge {
+        position: absolute;
+        bottom: 5px;
+        z-index: 6;
+        background: #ffffff;
+        padding: 3px 16px;
+        border-radius: 4px;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+        text-align: center;
+        border: 1px solid #ddd;
+        animation: popPlate 1s 2.5s cubic-bezier(0.175, 0.885, 0.32, 1.275) both;
+      }
+
+      .plate-country {
+        font-family: "Franklin Gothic Book", "Arial", sans-serif;
+        font-style: italic;
+        font-size: 0.55rem;
+        color: #00843d;
+        letter-spacing: 1px;
+        display: block;
+      }
+
+      .plate-number {
+        font-family: "Courier New", monospace;
+        font-weight: normal;
+        font-size: 1.05rem;
+        color: #111111;
+      }
+
+      .hero-location-box {
+        position: absolute;
+        bottom: 40px;
+        right: 40px;
+        z-index: 20;
+        text-align: right;
+        border-bottom: 3px solid #111111;
+        padding-bottom: 5px;
+      }
+
+      .hero-location-label {
+        font-family: "Franklin Gothic Book", "Arial", sans-serif;
+        font-style: italic;
+        font-size: 1.1rem;
+        color: #555555;
+        display: block;
+        margin-bottom: 2px;
+      }
+
+      .hero-location-value {
+        font-family: "Franklin Gothic Book", "Arial", sans-serif;
+        font-style: normal;
+        font-weight: normal;
+        font-size: 1.5rem;
+        color: #111111;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+      }
+
+      .scroll-indicator {
+        text-align: center;
+        z-index: 10;
+        font-family: "Franklin Gothic Book", "Arial", sans-serif;
+        font-style: italic;
+        font-size: 0.85rem;
+        color: #777777;
+        animation: bounce 2s infinite;
+      }
+
+      /* SECCIÓN 2: ESPECIFICACIONES TÉCNICAS */
+      .details-screen {
+        min-height: 100vh;
+        background-color: #ffffff;
+        padding: 50px 40px;
+      }
+
+      .section-header {
+        font-family: "Felix Titling", "Cinzel", "Georgia", serif;
+        font-size: 1.5rem;
+        color: #111111;
+        margin-bottom: 35px;
+        text-transform: uppercase;
+        letter-spacing: 2px;
+        font-weight: normal;
+      }
+
+      .specs-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+        gap: 25px;
+      }
+
+      .spec-item {
+        background: transparent;
+        padding: 8px 0px;
+        border: none;
+        border-bottom: 3px solid #111111;
+        border-radius: 0;
+        box-shadow: none;
+      }
+
+      .label-text {
+        font-family: "Franklin Gothic Book", "Franklin Gothic Medium", "Arial", sans-serif;
+        font-style: italic;
+        font-weight: normal;
+        font-size: 0.85rem;
+        color: #555555;
+        display: block;
+        margin-bottom: 4px;
+      }
+
+      .value-text {
+        font-family: "Franklin Gothic Book", "Franklin Gothic Medium", "Arial", sans-serif;
+        font-style: normal;
+        font-weight: normal;
+        font-size: 1.05rem;
+        color: #111111;
+        display: block;
+      }
+
+      .error-msg {
+        color: #dc3545;
+        font-family: sans-serif;
+        padding: 20px;
+        text-align: center;
+      }
+
+      /* ANIMACIONES */
+      @keyframes slowCarFadeIn {
+        0% { left: 120%; opacity: 0; }
+        100% { left: 50%; transform: translate(-50%, -50%); opacity: 1; }
+      }
+
+      @keyframes moveBrandLeft {
+        0% { left: 50%; transform: translate(-50%, -50%); opacity: 0.15; filter: grayscale(80%); }
+        100% { left: 20%; transform: translate(-50%, -50%); opacity: 1; filter: grayscale(0%); }
+      }
+
+      @keyframes popPlate {
+        0% { transform: scale(0); opacity: 0; }
+        100% { transform: scale(1); opacity: 1; }
+      }
+
+      @keyframes bounce {
+        0%, 20%, 50%, 80%, 100% { transform: translateY(0); }
+        40% { transform: translateY(-6px); }
+        60% { transform: translateY(-3px); }
+      }
+
+      @keyframes rotateIcon {
+        0% { transform: rotate(0deg); }
+        50% { transform: rotate(90deg); }
+        100% { transform: rotate(0deg); }
+      }
     </style>
-</head>
-<body>
-
-<div class="card" id="vehicleCard">
-    <div class="header">
-        <h2 id="modelo">Cargando...</h2>
-        <p id="placa"></p>
+  </head>
+  <body>
+    <!-- Aviso pantalla horizontal -->
+    <div class="portrait-warning">
+      <svg viewBox="0 0 24 24" fill="none" stroke="#00843D" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <rect x="5" y="2" width="14" height="20" rx="2" ry="2"></rect>
+        <line x1="12" y1="18" x2="12.01" y2="18"></line>
+      </svg>
+      <p>Por favor, gira tu dispositivo horizontalmente<br />para ver el vehículo a pantalla completa.</p>
     </div>
-    <div id="details"></div>
-</div>
 
-<script>
-    const urlParams = new URLSearchParams(window.location.search);
-    const unidadQuery = urlParams.get('unid');
+    <!-- PANTALLA 1: HERO SHOWCASE -->
+    <section class="hero-screen" id="heroScreen">
+      <div class="top-header">
+        <div class="header-title-small">Enterprise Rent-A-Car Guatemala</div>
+        <img class="enterprise-logo" src="https://media.licdn.com/dms/image/v2/C4D0BAQFjELQV6Mht4Q/company-logo_200_200/company-logo_200_200/0/1630461311753/enterprise_rent_a_car_national_car_rental_logo?e=2147483647&v=beta&t=tsnz9TENE3HzTYl_DXh8fKTlxwC25tFxa6G-yVBP_Mg" alt="Enterprise Rent-A-Car Logo" />
+      </div>
 
-    // Forzar actualización evitando caché con marca de tiempo
-    fetch('./vehiculos.json?v=' + new Date().getTime())
+      <div class="stage-container">
+        <div class="car-brand-title" id="carTitle">Cargando...</div>
+        <img class="brand-bg-logo" id="brandLogo" src="https://upload.wikimedia.org/wikipedia/commons/e/e7/Toyota.svg" alt="Brand Logo" />
+        <img class="car-transparent-img" id="carImg" src="https://pngimg.com/uploads/toyota/toyota_PNG1912.png" alt="Car Image" />
+
+        <div class="license-plate-badge">
+          <span class="plate-country">GUATEMALA</span>
+          <span class="plate-number" id="plateNumber">---</span>
+        </div>
+      </div>
+
+      <div class="hero-location-box">
+        <span class="hero-location-label">Ubicación Actual</span>
+        <span class="hero-location-value" id="locationValue">---</span>
+      </div>
+
+      <div class="scroll-indicator">
+        ▼ Desliza hacia abajo para ver especificaciones
+      </div>
+    </section>
+
+    <!-- PANTALLA 2: DATOS TÉCNICOS -->
+    <section class="details-screen">
+      <h2 class="section-header">Especificaciones Técnicas</h2>
+      <div class="specs-grid" id="specsGrid">
+        <!-- Generado dinámicamente -->
+      </div>
+    </section>
+
+    <!-- SCRIPT DE LECTURA DINÁMICA -->
+    <script>
+      const urlParams = new URLSearchParams(window.location.search);
+      const unidadQuery = urlParams.get('unid');
+
+      // Diccionario de logos por marca
+      const LOGOS_MARCA = {
+        TOYOTA: "https://upload.wikimedia.org/wikipedia/commons/e/e7/Toyota.svg",
+        CHEVROLET: "https://upload.wikimedia.org/wikipedia/commons/1/1e/Chevrolet_logo.svg",
+        RENAULT: "https://upload.wikimedia.org/wikipedia/commons/4/49/Renault_2021.svg",
+        HYUNDAI: "https://upload.wikimedia.org/wikipedia/commons/4/44/Hyundai_Motor_Company_logo.svg",
+        ISUZU: "https://upload.wikimedia.org/wikipedia/commons/2/23/Isuzu_logo.svg",
+        MITSUBISHI: "https://upload.wikimedia.org/wikipedia/commons/5/5a/Mitsubishi_logo.svg",
+        SUZUKI: "https://upload.wikimedia.org/wikipedia/commons/1/12/Suzuki_logo_2021.svg"
+      };
+
+      fetch('./vehiculos.json?v=' + new Date().getTime())
         .then(response => {
-            if (!response.ok) {
-                throw new Error('No se encontró el archivo vehiculos.json (HTTP ' + response.status + ')');
-            }
-            return response.json();
+          if (!response.ok) throw new Error('HTTP ' + response.status);
+          return response.json();
         })
         .then(data => {
-            if (!unidadQuery) {
-                document.getElementById('vehicleCard').innerHTML = `<div class="error">No se especificó ninguna unidad en la URL (ejemplo: ?unid=233053).</div>`;
-                return;
-            }
+          if (!unidadQuery) {
+            document.getElementById('carTitle').textContent = "UNIDAD NO ESPECIFICADA";
+            return;
+          }
 
-            // Buscar coincidencia en el campo No_Unidad o 'N.º Unid. '
-            const vehiculo = data.find(v => {
-                const unidVal = v.No_Unidad || v['N.º Unid. '] || v['No_Unidad'];
-                return String(unidVal).trim() === String(unidadQuery).trim();
+          const vehiculo = data.find(v => {
+            const unidVal = v.No_Unidad || v['N.º Unid. '] || v['No_Unidad'];
+            return String(unidVal).trim() === String(unidadQuery).trim();
+          });
+
+          if (vehiculo) {
+            const modelo = vehiculo.Modelo || vehiculo['Modelo'] || 'VEHÍCULO';
+            const ano = vehiculo.Ano || vehiculo['Año'] || '';
+            const placa = vehiculo.Placa || vehiculo['Placa'] || 'SIN PLACA';
+            const ubicacion = vehiculo.Ubicacion_Actual || vehiculo['Ubicación Actual'] || vehiculo.Sucursal || 'N/A';
+
+            // Actualizar vista Hero
+            document.getElementById('carTitle').textContent = `${modelo} ${ano}`;
+            document.getElementById('plateNumber').textContent = placa;
+            document.getElementById('locationValue').textContent = String(ubicacion) !== 'nan' ? ubicacion : 'N/A';
+
+            // Asignar logo de la marca según modelo
+            let marcaEncontrada = "TOYOTA";
+            const modUpper = modelo.toUpperCase();
+            if (modUpper.includes("N400") || modUpper.includes("AVEO") || modUpper.includes("CHEVROLET")) marcaEncontrada = "CHEVROLET";
+            else if (modUpper.includes("KOLEOS") || modUpper.includes("RENAULT")) marcaEncontrada = "RENAULT";
+            else if (modUpper.includes("STARIA") || modUpper.includes("CRETA") || modUpper.includes("TUCSON") || modUpper.includes("HYUNDAI")) marcaEncontrada = "HYUNDAI";
+            else if (modUpper.includes("D-MAX") || modUpper.includes("ISUZU")) marcaEncontrada = "ISUZU";
+            else if (modUpper.includes("L200") || modUpper.includes("MITSUBISHI")) marcaEncontrada = "MITSUBISHI";
+            else if (modUpper.includes("JIMNY") || modUpper.includes("VITARA") || modUpper.includes("SUZUKI")) marcaEncontrada = "SUZUKI";
+
+            document.getElementById('brandLogo').src = LOGOS_MARCA[marcaEncontrada] || LOGOS_MARCA.TOYOTA;
+
+            // Construir Especificaciones Técnicas
+            const campos = [
+              { label: "Año", val: ano },
+              { label: "Modelo", val: modelo },
+              { label: "Ubicación Actual", val: ubicacion },
+              { label: "Sucursal Asignada", val: vehiculo.Sucursal || vehiculo['Sucursal  '] },
+              { label: "Color", val: vehiculo.Color || vehiculo['Color'] },
+              { label: "Carrocería / Transmisión", val: vehiculo.Carroceria || vehiculo['Carrocería'] },
+              { label: "Kilometraje", val: vehiculo.Kilometros ? Number(vehiculo.Kilometros).toLocaleString() + ' km' : 'N/A' },
+              { label: "Estado del Vehículo", val: vehiculo.Estado || vehiculo['Estado'] },
+              { label: "Número de Unidad", val: '#' + (vehiculo.No_Unidad || unidadQuery) },
+              { label: "Último Arrendamiento", val: vehiculo.Ult_Arrendamiento || vehiculo['Últ. Arrend.'] },
+              { label: "Días Inactivo", val: vehiculo.Dia_Inactivo || vehiculo['dia inactivo'] }
+            ];
+
+            let specsHTML = '';
+            campos.forEach(c => {
+              const valDisplay = (c.val !== undefined && c.val !== null && String(c.val) !== 'nan' && String(c.val) !== 'N/A') ? c.val : 'Sin datos';
+              specsHTML += `
+                <div class="spec-item">
+                  <span class="label-text">${c.label}</span>
+                  <span class="value-text">${valDisplay}</span>
+                </div>`;
             });
+            document.getElementById('specsGrid').innerHTML = specsHTML;
 
-            if (vehiculo) {
-                const modelo = vehiculo.Modelo || vehiculo['Modelo'] || 'Vehículo';
-                const ano = vehiculo.Ano || vehiculo['Año'] || '';
-                const placa = vehiculo.Placa || vehiculo['Placa'] || 'Sin Placa';
-                const unid = vehiculo.No_Unidad || vehiculo['N.º Unid. '] || unidadQuery;
-
-                document.getElementById('modelo').textContent = `${modelo} ${ano ? '(' + ano + ')' : ''}`;
-                document.getElementById('placa').textContent = `Placa: ${placa} | Unidad: #${unid}`;
-
-                const campos = [
-                    { label: "Sucursal", val: vehiculo.Sucursal || vehiculo['Sucursal  '] },
-                    { label: "Ubicación Actual", val: vehiculo.Ubicacion_Actual || vehiculo['Ubicación Actual'] },
-                    { label: "Carrocería", val: vehiculo.Carroceria || vehiculo['Carrocería'] },
-                    { label: "Color", val: vehiculo.Color || vehiculo['Color'] },
-                    { label: "Kilómetros", val: vehiculo.Kilometros || vehiculo['Kilómetros'] },
-                    { label: "Estado", val: vehiculo.Estado || vehiculo['Estado'] },
-                    { label: "Últ. Arrendamiento", val: vehiculo.Ult_Arrendamiento || vehiculo['Últ. Arrend.'] },
-                    { label: "Días Inactivo", val: vehiculo.Dia_Inactivo || vehiculo['dia inactivo'] },
-                    { label: "Fecha Registro / Hoy", val: vehiculo.Dia_Hoy || vehiculo['Dia de hoy'] }
-                ];
-
-                let htmlContent = '';
-                campos.forEach(c => {
-                    const valorMostrar = (c.val !== undefined && c.val !== null && c.val !== '' && String(c.val) !== 'nan' && String(c.val) !== 'N/A') ? c.val : 'Sin datos';
-                    htmlContent += `
-                        <div class="data-row">
-                            <span class="label">${c.label}:</span>
-                            <span class="value">${valorMostrar}</span>
-                        </div>`;
-                });
-                document.getElementById('details').innerHTML = htmlContent;
-            } else {
-                document.getElementById('vehicleCard').innerHTML = `<div class="error">No se encontró la unidad #${unidadQuery} en la base de datos.</div>`;
-            }
+          } else {
+            document.getElementById('carTitle').textContent = `UNIDAD #${unidadQuery} NO ENCONTRADA`;
+          }
         })
         .catch(err => {
-            console.error("Error al procesar el archivo:", err);
-            document.getElementById('vehicleCard').innerHTML = `<div class="error">Error al cargar la información.<br><br><small style="font-weight:normal; color:#666;">Detalle técnico: ${err.message}</small></div>`;
+          console.error(err);
+          document.getElementById('carTitle').textContent = "ERROR AL CARGAR DATOS";
         });
-</script>
-</body>
+    </script>
+  </body>
 </html>
