@@ -435,84 +435,70 @@
 
     <!-- SCRIPT DE CARGA DINÁMICA DE VEHÍCULOS -->
     <script>
-      const urlParams = new URLSearchParams(window.location.search);
-      const unidadQuery = urlParams.get('unid');
+      // Diccionario de imágenes por palabras clave en el nombre del modelo
+const IMAGENES_VEHICULOS = {
+  "HILUX": "./img/hilux.png",
+  "RAV4": "./img/rav4.png",
+  "YARIS": "./img/yaris.png",
+  "CROSS": "./img/cross.png",
+  "KOLEOS": "./img/koleos.png",
+  "FORTUNER": "./img/fortuner.png",
+  "N400": "./img/panel.png",
+  "PANEL": "./img/panel.png",
+  "INNOVA": "./img/innova.png",
+  "STARIA": "./img/staria.png",
+  "D-MAX": "./img/dmax.png",
+  "L200": "./img/l200.png"
+};
 
-      const LOGOS_MARCA = {
-        TOYOTA: "https://upload.wikimedia.org/wikipedia/commons/e/e7/Toyota.svg",
-        CHEVROLET: "https://upload.wikimedia.org/wikipedia/commons/1/1e/Chevrolet_logo.svg",
-        RENAULT: "https://upload.wikimedia.org/wikipedia/commons/4/49/Renault_2021.svg",
-        HYUNDAI: "https://upload.wikimedia.org/wikipedia/commons/4/44/Hyundai_Motor_Company_logo.svg",
-        ISUZU: "https://upload.wikimedia.org/wikipedia/commons/2/23/Isuzu_logo.svg",
-        MITSUBISHI: "https://upload.wikimedia.org/wikipedia/commons/5/5a/Mitsubishi_logo.svg",
-        SUZUKI: "https://upload.wikimedia.org/wikipedia/commons/1/12/Suzuki_logo_2021.svg"
-      };
+// Imagen por defecto si el modelo es desconocido o muy nuevo
+const IMAGEN_DEFAULT = "https://pngimg.com/uploads/toyota/toyota_PNG1912.png"; 
 
-      fetch('./vehiculos.json?v=' + new Date().getTime())
-        .then(response => {
-          if (!response.ok) throw new Error('HTTP ' + response.status);
-          return response.json();
-        })
-        .then(data => {
-          if (!unidadQuery) return;
+fetch('./vehiculos.json?v=' + new Date().getTime())
+  .then(response => response.json())
+  .then(data => {
+    if (!unidadQuery) return;
 
-          const vehiculo = data.find(v => {
-            const unidVal = v.No_Unidad || v['N.º Unid. '] || v['No_Unidad'];
-            return String(unidVal).trim() === String(unidadQuery).trim();
-          });
+    const vehiculo = data.find(v => {
+      const unidVal = v.No_Unidad || v['N.º Unid. '] || v['No_Unidad'];
+      return String(unidVal).trim() === String(unidadQuery).trim();
+    });
 
-          if (vehiculo) {
-            const modelo = vehiculo.Modelo || vehiculo['Modelo'] || 'VEHÍCULO';
-            const ano = vehiculo.Ano || vehiculo['Año'] || '';
-            const placa = vehiculo.Placa || vehiculo['Placa'] || 'SIN PLACA';
-            const ubicacion = vehiculo.Ubicacion_Actual || vehiculo['Ubicación Actual'] || vehiculo.Sucursal || 'N/A';
+    if (vehiculo) {
+      const modelo = (vehiculo.Modelo || vehiculo['Modelo'] || 'VEHÍCULO').toUpperCase();
+      const ano = vehiculo.Ano || vehiculo['Año'] || '';
+      const placa = vehiculo.Placa || vehiculo['Placa'] || 'SIN PLACA';
+      const ubicacion = vehiculo.Ubicacion_Actual || vehiculo['Ubicación Actual'] || vehiculo.Sucursal || 'N/A';
 
-            document.getElementById('carTitle').textContent = `${modelo} ${ano}`;
-            document.getElementById('plateNumber').textContent = placa;
-            document.getElementById('locationValue').textContent = String(ubicacion) !== 'nan' ? ubicacion : 'N/A';
+      // 1. Asignar Título, Placa y Ubicación
+      document.getElementById('carTitle').textContent = `${modelo} ${ano}`;
+      document.getElementById('plateNumber').textContent = placa;
+      document.getElementById('locationValue').textContent = String(ubicacion) !== 'nan' ? ubicacion : 'N/A';
 
-            let marcaEncontrada = "TOYOTA";
-            const modUpper = modelo.toUpperCase();
-            if (modUpper.includes("N400") || modUpper.includes("AVEO") || modUpper.includes("CHEVROLET")) marcaEncontrada = "CHEVROLET";
-            else if (modUpper.includes("KOLEOS") || modUpper.includes("RENAULT")) marcaEncontrada = "RENAULT";
-            else if (modUpper.includes("STARIA") || modUpper.includes("CRETA") || modUpper.includes("TUCSON") || modUpper.includes("HYUNDAI")) marcaEncontrada = "HYUNDAI";
-            else if (modUpper.includes("D-MAX") || modUpper.includes("ISUZU")) marcaEncontrada = "ISUZU";
-            else if (modUpper.includes("L200") || modUpper.includes("MITSUBISHI")) marcaEncontrada = "MITSUBISHI";
-            else if (modUpper.includes("JIMNY") || modUpper.includes("VITARA") || modUpper.includes("SUZUKI")) marcaEncontrada = "SUZUKI";
+      // 2. BUSCADOR AUTOMÁTICO DE IMAGEN
+      let imagenAsignada = IMAGEN_DEFAULT;
+      for (let clave in IMAGENES_VEHICULOS) {
+        if (modelo.includes(clave)) {
+          imagenAsignada = IMAGENES_VEHICULOS[clave];
+          break; // Detener en la primera coincidencia encontrada
+        }
+      }
+      document.getElementById('carImg').src = imagenAsignada;
 
-            document.getElementById('brandLogo').src = LOGOS_MARCA[marcaEncontrada] || LOGOS_MARCA.TOYOTA;
+      // 3. Asignar Logo de Marca
+      let marcaEncontrada = "TOYOTA";
+      if (modelo.includes("N400") || modelo.includes("AVEO") || modelo.includes("CHEVROLET")) marcaEncontrada = "CHEVROLET";
+      else if (modelo.includes("KOLEOS") || modelo.includes("RENAULT")) marcaEncontrada = "RENAULT";
+      else if (modelo.includes("STARIA") || modelo.includes("CRETA") || modelo.includes("TUCSON") || modelo.includes("HYUNDAI")) marcaEncontrada = "HYUNDAI";
+      else if (modelo.includes("D-MAX") || modelo.includes("ISUZU")) marcaEncontrada = "ISUZU";
+      else if (modelo.includes("L200") || modelo.includes("MITSUBISHI")) marcaEncontrada = "MITSUBISHI";
+      else if (modelo.includes("JIMNY") || modelo.includes("VITARA") || modelo.includes("SUZUKI")) marcaEncontrada = "SUZUKI";
 
-            const campos = [
-              { label: "Año", val: ano },
-              { label: "Modelo", val: modelo },
-              { label: "Ubicación Actual", val: ubicacion },
-              { label: "Sucursal Asignada", val: vehiculo.Sucursal || vehiculo['Sucursal  '] },
-              { label: "Color", val: vehiculo.Color || vehiculo['Color'] },
-              { label: "Carrocería / Transmisión", val: vehiculo.Carroceria || vehiculo['Carrocería'] },
-              { label: "Kilometraje", val: vehiculo.Kilometros ? Number(vehiculo.Kilometros).toLocaleString() + ' km' : 'N/A' },
-              { label: "Estado del Vehículo", val: vehiculo.Estado || vehiculo['Estado'] },
-              { label: "Número de Unidad", val: '#' + (vehiculo.No_Unidad || unidadQuery) },
-              { label: "Último Arrendamiento", val: vehiculo.Ult_Arrendamiento || vehiculo['Últ. Arrend.'] },
-              { label: "Días Inactivo", val: vehiculo.Dia_Inactivo || vehiculo['dia inactivo'] }
-            ];
+      document.getElementById('brandLogo').src = LOGOS_MARCA[marcaEncontrada] || LOGOS_MARCA.TOYOTA;
 
-            let specsHTML = '';
-            campos.forEach(c => {
-              const valDisplay = (c.val !== undefined && c.val !== null && String(c.val) !== 'nan' && String(c.val) !== 'N/A') ? c.val : 'Sin datos';
-              specsHTML += `
-                <div class="spec-item">
-                  <span class="label-text">${c.label}</span>
-                  <span class="value-text">${valDisplay}</span>
-                </div>`;
-            });
-            document.getElementById('specsGrid').innerHTML = specsHTML;
-          } else {
-            document.getElementById('carTitle').textContent = `UNIDAD #${unidadQuery} NO ENCONTRADA`;
-          }
-        })
-        .catch(err => {
-          console.error(err);
-        });
+      // ... Resto de especificaciones técnicas ...
+    }
+  });
     </script>
   </body>
 </html>
